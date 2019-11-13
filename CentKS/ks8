@@ -1,0 +1,49 @@
+#version=RHEL8
+ignoredisk --only-use=sda
+# Partition clearing information
+clearpart --none --initlabel
+# Use graphical install
+graphical
+repo --name="AppStream" --baseurl=http://mirror.yandex.ru/centos/8/BaseOS/x86_64/os/../../../AppStream/x86_64/os/
+# Use network installation
+url --url="http://mirror.yandex.ru/centos/8/BaseOS/x86_64/os"
+# Keyboard layouts
+keyboard --vckeymap=us --xlayouts='us'
+# System language
+lang en_US.UTF-8
+
+# Network information
+network  --bootproto=static --device=ens33 --gateway=192.168.88.1 --ip=192.168.88.10 --nameserver=1.1.1.1 --netmask=255.255.255.0 --noipv6 --activate
+network  --hostname=dsu100
+# Root password
+rootpw j3qq4idkfa
+# Run the Setup Agent on first boot
+firstboot --enable
+# Do not configure the X Window System
+skipx
+# System services
+services --enabled="chronyd"
+# System timezone
+timezone Europe/Moscow --isUtc
+# Disk partitioning information
+clearpart --all --initlabel --drives=sda
+autopart --type=lvm --nohome
+
+%packages
+@^minimal-environment
+kexec-tools
+
+%end
+
+%addon com_redhat_kdump --enable --reserve-mb='auto'
+
+%end
+
+%anaconda
+pwpolicy root --minlen=6 --minquality=1 --notstrict --nochanges --notempty
+pwpolicy user --minlen=6 --minquality=1 --notstrict --nochanges --emptyok
+pwpolicy luks --minlen=6 --minquality=1 --notstrict --nochanges --notempty
+%end
+reboot
+
+
